@@ -6,8 +6,11 @@ const port = 3000
 
 connectToMongo();
 
+app.use('/api/auth',require('./routes/auth'))
+//app.use('/api/notes','./routes/notes')
+
 app.get('/', (req, res) => {
-  res.send('Hello World!')
+  res.send('HelloWorld!')
 })
 
 app.listen(port, () => {
