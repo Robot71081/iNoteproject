@@ -2,12 +2,21 @@ import React, { useContext, useEffect ,useRef,useState} from "react";
 import noteContext from "../context/notes/NoteContext";
 import NoteItem from "./NoteItem";
 import Addnote from "./Addnote";
+import { useNavigate } from "react-router-dom";
 
-const Notes = () => {
+const Notes = (props) => {
+  let navigate=useNavigate()
   const context = useContext(noteContext);
   const { Notes, getNotes,editNote } = context;
   useEffect(() => {
-    getNotes();
+    if(localStorage.getItem('token')){
+      getNotes();
+    }
+    else
+    {
+      navigate('/login')
+    }
+    
   }, []);
 
   const ref=useRef(null)
@@ -17,12 +26,14 @@ const Notes = () => {
   const updateNote = (currentNote) => {
     ref.current.click()
     setNote({id:currentNote._id,etitle:currentNote.title,edescription:currentNote.description,etag:currentNote.tag})
+   
   };
   
 
   const handleclick=(e)=>{
     editNote(note.id,note.etitle,note.edescription,note.etag)
    refClose.current.click()
+   props.showAlert("updated Successfully","success")
 
     
 }
@@ -32,7 +43,7 @@ setNote({...note,[e.target.name]:e.target.value})
 }
   return (
     <>
-      <Addnote />
+      <Addnote showAlert={props.showAlert} />
       <button type="button"  ref={ref} className="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#exampleModal">
   Launch demo modal
 </button>
@@ -72,7 +83,8 @@ setNote({...note,[e.target.name]:e.target.value})
         id="etitle"
         name="etitle"
         value={note.etitle}
-        
+        minLength={5}
+        required
         onChange={onchange}
       />
     </div>
@@ -86,6 +98,8 @@ setNote({...note,[e.target.name]:e.target.value})
         name="edescription"
         rows="3"
         value={note.edescription}
+        minLength={5}
+        required
         onChange={onchange}
       ></textarea>
      </div>
@@ -115,7 +129,7 @@ setNote({...note,[e.target.name]:e.target.value})
               >
                 Close
               </button>
-              <button type="button" className="btn btn-primary" onClick={handleclick}>
+              <button type="button"  disabled={note.etitle.length<5 ||note.edescription.length<5} className="btn btn-primary" onClick={handleclick}>
                Update Note
               </button>
             </div>
@@ -125,9 +139,11 @@ setNote({...note,[e.target.name]:e.target.value})
       <div>
         <div className="row my-3">
           <h1>Your Notes</h1>
+          <div className="container mx-2"> {Notes.length===0 && 'No Notes to display'}</div>
+         
           {Notes.map((note) => {
             return (
-              <NoteItem key={note._id} note={note} updateNote={updateNote} />
+              <NoteItem key={note._id} note={note} updateNote={updateNote} showAlert={props.showAlert}/>
             );
           })}
         </div>

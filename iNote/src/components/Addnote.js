@@ -1,13 +1,15 @@
 import React,{useContext, useState} from 'react'
 import noteContext from "../context/notes/NoteContext";
 
-const Addnote = () => {
+const Addnote = (props) => {
     const context=useContext(noteContext);
     const {addNote}=context;
-    const [note,setNote]=useState({title:"",description:"",tag:"default"})
+    const [note,setNote]=useState({title:"",description:"",tag:""})
     const handleclick=(e)=>{
         e.preventDefault();
         addNote(note.title,note.description,note.tag)
+        setNote({title:"",description:"",tag:""})
+        props.showAlert("added Successfully","success")
     }
 
     const onchange=(e)=>{
@@ -27,7 +29,9 @@ const Addnote = () => {
         className="form-control"
         id="title"
         name="title"
-        
+        minLength={5}
+        required
+        value={note.title}
         onChange={onchange}
       />
     </div>
@@ -40,6 +44,9 @@ const Addnote = () => {
         id="description"
         name="description"
         rows="3"
+        minLength={5}
+        required
+        value={note.description}
         onChange={onchange}
       ></textarea>
      </div>
@@ -52,11 +59,12 @@ const Addnote = () => {
         className="form-control"
         id="tag"
         name="tag"
+        value={note.tag}
         
         onChange={onchange}
       />
     </div>
-     <button type="submit" className="btn btn-primary" onClick={handleclick}>Add Note</button>
+     <button type="submit"  disabled={note.title.length<5 ||note.description.length<5}className="btn btn-primary" onClick={handleclick}>Add Note</button>
      </form>
   </div>
   )
